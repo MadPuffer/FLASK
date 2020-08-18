@@ -97,6 +97,7 @@ def configurator():
         'motherboard': session.query(Hardware).filter(Hardware.hardware_type == 'motherboard'),
         'cpu': session.query(Hardware).filter(Hardware.hardware_type == 'cpu'),
         'ram': session.query(Hardware).filter(Hardware.hardware_type == 'ram'),
+        'gpu': session.query(Hardware).filter(Hardware.hardware_type == 'gpu'),
         'hdd': session.query(Hardware).filter(Hardware.hardware_type == 'hdd'),
         # 'ssd': session.query(Hardware).filter(Hardware.hardware_type == 'ssd'),
         'ps': session.query(Hardware).filter(Hardware.hardware_type == 'ps'),
