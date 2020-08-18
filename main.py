@@ -83,15 +83,27 @@ def videoCard(type):
 @app.route('/configurator')
 def configurator():
     confList = {
-        'Motherboard': {"name": "Материнка", "pic": 'motherboard.svg'},
-        'Cpu': {"name": "Проц", "pic": 'cpu.svg'},
-        'Ram': {"name": "Опера", "pic": 'ram.svg'},
-        'Card': {"name": "Видик", "pic": 'card.svg'},
-        'HDD': {"name": "Накопитель", "pic": 'hdd.svg'},
-        'PS': {"name": "БП", "pic": 'power.svg'},
-        'Case': {"name": "Гроб", "pic": 'case.svg'},
+        'Motherboard': {"name": "Материнка", "pic": 'motherboard.svg', 'h_name': 'motherboard'},
+        'Cpu': {"name": "Проц", "pic": 'cpu.svg', 'h_name': 'cpu'},
+        'Ram': {"name": "Опера", "pic": 'ram.svg', 'h_name': 'ram'},
+        'Card': {"name": "Видик", "pic": 'card.svg', 'h_name': 'gpu'},
+        'HDD': {"name": "Накопитель", "pic": 'hdd.svg', 'h_name': 'hdd'},
+        'PS': {"name": "БП", "pic": 'power.svg', 'h_name': 'ps'},
+        'Case': {"name": "Гроб", "pic": 'case.svg', 'h_name': 'case'},
     }
-    return render_template('configurator.html', confList=confList)
+
+    session = db_session.create_session()
+    hardware_list = {
+        'motherboard': session.query(Hardware).filter(Hardware.hardware_type == 'motherboard'),
+        'cpu': session.query(Hardware).filter(Hardware.hardware_type == 'cpu'),
+        'ram': session.query(Hardware).filter(Hardware.hardware_type == 'ram'),
+        'hdd': session.query(Hardware).filter(Hardware.hardware_type == 'hdd'),
+        # 'ssd': session.query(Hardware).filter(Hardware.hardware_type == 'ssd'),
+        'ps': session.query(Hardware).filter(Hardware.hardware_type == 'ps'),
+        'case': session.query(Hardware).filter(Hardware.hardware_type == 'case')
+    }
+
+    return render_template('configurator.html', confList=confList, hardware_list=hardware_list)
 
 
 if __name__ == '__main__':
