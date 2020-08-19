@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
     let hardwareBlocks = document.querySelectorAll('.js-hardware-block');
     
-    let motherboardBlock = document.querySelector('.origin-motherboard'),
-        cpuBlock = document.querySelector('.origin-cpu'),
-        ramBlock = document.querySelector('.origin-ram'),
-        gpuBlock = document.querySelector('.origin-gpu'),
-        hddBlock = document.querySelector('.origin-hdd'),
-        psBlock = document.querySelector('.origin-ps'),
-        caseBlock = document.querySelector('.origin-case');
+    let motherboardBlock = document.querySelector('.origin-motherboard').innerHTML,
+        cpuBlock = document.querySelector('.origin-cpu').innerHTML,
+        ramBlock = document.querySelector('.origin-ram').innerHTML,
+        gpuBlock = document.querySelector('.origin-gpu').innerHTML,
+        hddBlock = document.querySelector('.origin-hdd').innerHTML,
+        psBlock = document.querySelector('.origin-ps').innerHTML,
+        caseBlock = document.querySelector('.origin-case').innerHTML;
     
     hardwareBlocks.forEach(function(item){
 
@@ -19,6 +19,39 @@ document.addEventListener('DOMContentLoaded', function() {
          let originBlock = document.querySelector('.origin-' + hardwareBlockClass);
          originBlock.innerHTML = content;
          let closeButton = document.createElement('div');
+         closeButton.addEventListener('click', function(e) {
+             let originBlockClass = originBlock.classList[3];
+             
+             if (originBlockClass == 'origin-motherboard'){
+                 originBlock.innerHTML = motherboardBlock;
+             }
+             
+             if (originBlockClass == 'origin-cpu'){
+                 originBlock.innerHTML = cpuBlock;
+             }
+             
+             if (originBlockClass == 'origin-gpu'){
+                 originBlock.innerHTML = gpuBlock;
+             }
+             
+             if (originBlockClass == 'origin-ram'){
+                 originBlock.innerHTML = ramBlock;
+             }
+             
+             if (originBlockClass == 'origin-hdd'){
+                 originBlock.innerHTML = hddBlock;
+             }
+             
+             if (originBlockClass == 'origin-ps'){
+                 originBlock.innerHTML = psBlock;
+             }
+             
+             if (originBlockClass == 'origin-case'){
+                 originBlock.innerHTML = caseBlock;
+             }
+             
+              
+         });
          closeButton.innerHTML = '<div class="close-container"><div class="leftright"></div><div class="rightleft"></div></div>';                           
                                 
          originBlock.querySelector('.hardware-spec').before(closeButton);
