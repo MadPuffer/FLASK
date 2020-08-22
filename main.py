@@ -1,6 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from data import db_session
 from data.hardware import Hardware
+from data.configurator import Configurator
+from sqlalchemy import or_
+import random
 
 app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = 'gayGard'
@@ -98,13 +101,48 @@ def configurator():
         'cpu': session.query(Hardware).filter(Hardware.hardware_type == 'cpu'),
         'ram': session.query(Hardware).filter(Hardware.hardware_type == 'ram'),
         'gpu': session.query(Hardware).filter(Hardware.hardware_type == 'gpu'),
-        'hdd': session.query(Hardware).filter(Hardware.hardware_type == 'hdd'),
-        # 'ssd': session.query(Hardware).filter(Hardware.hardware_type == 'ssd'),
+        'hdd': session.query(Hardware).filter(or_(Hardware.hardware_type == 'hdd', Hardware.hardware_type == 'ssd')),
         'ps': session.query(Hardware).filter(Hardware.hardware_type == 'ps'),
         'case': session.query(Hardware).filter(Hardware.hardware_type == 'case')
     }
 
     return render_template('configurator.html', confList=confList, hardware_list=hardware_list)
+
+
+@app.route('/saveCfg', methods=['POST'])
+def save_cfg():
+    data = request.get_json()
+    session = db_session.create_session()
+    configurator = Configurator()
+    configurator.name = 'Configuration' + str(random.randrange(0, 1000))
+    configurator.motherboard = data['motherboard']
+    configurator.cpu = data['cpu']
+    configurator.ram = data['ram']
+    configurator.gpu = data['gpu']
+    configurator.drive = data['drive']
+    configurator.ps = data['ps']
+    configurator.case = data['case']
+    hardware = session.query(Hardware).filter(Hardware.name == configurator.case)
+    for i in hardware:
+        configurator.picture = i.picture
+    session.merge(configurator)
+    session.commit()
+    return jsonify({'result': 'success'})
+
+
+@app.route('/configurations')
+def all_configurations():
+    session = db_session.create_session()
+    configurations = session.query(Configurator)
+    return render_template('configurations.html', pageTitle='Конфигурации', conf_list=configurations)
+
+
+@app.route('/search')
+def search():
+    session = db_session.create_session()
+    s = request.args.get('s')
+    hardware_list = session.query(Hardware).filter(Hardware.name.contains(s))
+    return render_template('index.html', hardwareList=hardware_list, pageTitle='Поиск')
 
 
 if __name__ == '__main__':
