@@ -114,7 +114,10 @@ def save_cfg():
     data = request.get_json()
     session = db_session.create_session()
     configurator = Configurator()
-    configurator.name = 'Configuration' + str(random.randrange(0, 1000))
+    if data['configurationName'] == '':
+        configurator.name = 'Configuration' + str(random.randrange(0, 1000))
+    else:
+        configurator.name = data['configurationName']
     configurator.motherboard = data['motherboard']
     configurator.cpu = data['cpu']
     configurator.ram = data['ram']
@@ -137,12 +140,62 @@ def all_configurations():
     return render_template('configurations.html', pageTitle='Конфигурации', conf_list=configurations)
 
 
+@app.route('/configuration/<int:id>')
+def one_configuration(id):
+    session = db_session.create_session()
+    conf_list = session.query(Configurator).filter(Configurator.id == id)
+    for hardware in conf_list:
+        list = {
+            'motherboard': hardware.motherboard,
+            'cpu': hardware.cpu,
+            'ram': hardware.ram,
+            'gpu': hardware.gpu,
+            'drive': hardware.drive,
+            'ps': hardware.ps,
+            'case': hardware.case
+        }
+
+    hardware_list = {
+        'motherboard': session.query(Hardware).filter(Hardware.name == list['motherboard']),
+        'cpu': session.query(Hardware).filter(Hardware.name == list['cpu']),
+        'ram': session.query(Hardware).filter(Hardware.name == list['ram']),
+        'gpu': session.query(Hardware).filter(Hardware.name == list['gpu']),
+        'drive': session.query(Hardware).filter(Hardware.name == list['drive']),
+        'ps': session.query(Hardware).filter(Hardware.name == list['ps']),
+        'case': session.query(Hardware).filter(Hardware.name == list['case'])
+    }
+    return render_template('configuration.html', conf_list=list, hardware_list=hardware_list)
+
+
 @app.route('/search')
 def search():
     session = db_session.create_session()
     s = request.args.get('s')
     hardware_list = session.query(Hardware).filter(Hardware.name.contains(s))
     return render_template('index.html', hardwareList=hardware_list, pageTitle='Поиск')
+
+
+@app.route('/getprice', methods=["GET", "POST"])
+def get_price():
+    data = request.get_json()
+    price_list = data['priceList']
+    result = 0
+    try:
+        for price in price_list:
+            result += int(''.join(price.split()[0:-1]))
+    except TypeError:
+        print('ашибка: инсаф гомосексуалист')
+    if 999 < result < 10000:
+        result = [i for i in str(result)]
+        result = f"{''.join(result[0:1])} {''.join(result[1: len(result)])}"
+    elif 9999 < result < 100000:
+        result = [i for i in str(result)]
+        result = f"{''.join(result[0:2])} {''.join(result[2: len(result)])}"
+    elif 99999 < result < 1000000:
+        result = [i for i in str(result)]
+        result = f"{''.join(result[0:3])} {''.join(result[3: len(result)])}"
+
+    return jsonify({'price': result})
 
 
 if __name__ == '__main__':
